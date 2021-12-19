@@ -64,30 +64,22 @@ function readTransactions(filename) {
 async function main() {
   const accounts_file = 'accounts.csv';
   const accounts_end_file = 'accounts_end.csv';
-  // const accounts_file = 'accounts.csv';
   const batches = [1000, 5000, 10000];
   const transaction_files = batches.map((amount) => `transactions_${amount}.csv`);
   // console.log(transaction_files);
 
   const accounts = await readAccounts(accounts_file);
-  // console.log(accounts);
 
   for (const file of transaction_files) {
     const transactions = await readTransactions(file);
-    // console.log(transactions)
     transactions.forEach((tx) => {
-      // console.log(tx);
       accounts[tx.sender].balance -= tx.amount;
       accounts[tx.receiver].balance += tx.amount;
-      // accounts[senderId].balance -= tx.amount;
-      // accounts[receiverId].balance += tx.amount;
     });
   }
 
-  // console.log(accounts);
-  // // Compare
+  // Compare
   const accountsEnd = await readAccounts(accounts_end_file);
-
   for (let i = 0; i < accounts.length; i++){
     assert(accounts[i].balance === accountsEnd[i].balance);
   }
