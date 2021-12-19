@@ -39,6 +39,49 @@ function generateTransaction(senderAccount, receiverAccount, amountMax) {
   return new Transaction(senderAccount.name, receiverAccount.name, rand(amountMax));
 }
 
+function generateTransactions(accounts, numTransactions, amountMax) {
+  const transactions = [];
+  // Generate Transactions
+  // const accountsForTransaction = chooseRandom(accounts, 2)
+  // console.log(accountsForTransaction);
+  for(var i = 0; i < numTransactions; i++){
+    var senderId = 3; 
+    var receiverId = 3; 
+    // console.log(accounts.length)
+    // run this loop until numberOne is different than numberThree
+    do {
+        senderId = rand(accounts.length);
+        receiverId = rand(accounts.length);
+    } while((senderId === receiverId));
+
+    // console.log(senderId)
+    // console.log(receiverId)
+    
+    const tx = generateTransaction(accounts[senderId], accounts[receiverId], amountMax);
+    accounts[senderId].balance -= tx.amount;
+    accounts[receiverId].balance += tx.amount;
+    // accounts.push(initialBalance);
+    transactions.push(tx);
+  } 
+
+
+  // Write to CSV
+  const transactionsWriter = createCsvWriter({
+    path: `transactions_${numTransactions}.csv`,
+    header: [
+      {id: 'sender', title: 'sender'},
+      {id: 'receiver', title: 'receiver'},
+      {id: 'amount', title: 'amount'},
+    ]
+  });
+
+  transactionsWriter
+  .writeRecords(transactions)
+  .then(()=> console.log('The CSV file was written successfully'));
+
+
+}
+
 function main() {
   
   const numAccounts = 1000;
@@ -47,6 +90,7 @@ function main() {
   const transctionMaxAmount = 10;
   const accounts = [];
   const transactions = [];
+  const batches = [1000, 5000, 10000];
   // Generate number of accounts
   for(var i = 0; i < numAccounts; i++){
 
@@ -67,43 +111,13 @@ function main() {
   .writeRecords(accounts)
   .then(()=> console.log('The CSV file was written successfully'));
 
-  // Generate Transactions
-  // const accountsForTransaction = chooseRandom(accounts, 2)
-  // console.log(accountsForTransaction);
-  for(var i = 0; i < numTransactions; i++){
-    var senderId = 3; 
-    var receiverId = 3; 
-    // console.log(accounts.length)
-    // run this loop until numberOne is different than numberThree
-    do {
-        senderId = rand(accounts.length);
-        receiverId = rand(accounts.length);
-    } while((senderId === receiverId));
-    // console.log(senderId)
-    // console.log(receiverId)
-    
-    const tx = generateTransaction(accounts[senderId], accounts[receiverId], transctionMaxAmount);
-    accounts[senderId].balance -= tx.amount;
-    accounts[receiverId].balance += tx.amount;
-    // accounts.push(initialBalance);
-    transactions.push(tx);
-  } 
-  
-  // Write to CSV
-  const transactionsWriter = createCsvWriter({
-    path: 'transactions.csv',
-    header: [
-      {id: 'sender', title: 'sender'},
-      {id: 'receiver', title: 'receiver'},
-      {id: 'amount', title: 'amount'},
-    ]
+
+  // Generate for each batch
+  batches.forEach(element => {
+    generateTransactions(accounts, element, transctionMaxAmount)
   });
-
-  transactionsWriter
-  .writeRecords(transactions)
-  .then(()=> console.log('The CSV file was written successfully'));
-
-
+ 
+  
   // Write to CSV
   const accountsEndWriter = createCsvWriter({
     path: 'accounts_end.csv',
