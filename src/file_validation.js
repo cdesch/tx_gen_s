@@ -1,7 +1,6 @@
 const { assert } = require('console');
 const csv = require('csv-parser');
 const fs = require('fs');
-// const accounts = [];
 
 class Account {
   constructor(id, name, balance) {
@@ -62,10 +61,10 @@ function readTransactions(filename) {
 }
 
 async function main() {
-  const accounts_file = 'accounts.csv';
-  const accounts_end_file = 'accounts_end.csv';
+  const accounts_file = '../data/accounts.csv';
+  const accounts_end_file = '../data/accounts_end.csv';
   const batches = [1000, 5000, 10000];
-  const transaction_files = batches.map((amount) => `transactions_${amount}.csv`);
+  const transaction_files = batches.map((amount) => `../data/transactions_${amount}.csv`);
   // console.log(transaction_files);
 
   const accounts = await readAccounts(accounts_file);
@@ -78,13 +77,31 @@ async function main() {
     });
   }
 
-  // Compare
+  // Repeat
+  for (const file of transaction_files) {
+    const transactions = await readTransactions(file);
+    transactions.forEach((tx) => {
+      accounts[tx.sender].balance -= tx.amount;
+      accounts[tx.receiver].balance += tx.amount;
+    });
+  }
+
+  // Repeat
+  for (const file of transaction_files) {
+    const transactions = await readTransactions(file);
+    transactions.forEach((tx) => {
+      accounts[tx.sender].balance -= tx.amount;
+      accounts[tx.receiver].balance += tx.amount;
+    });
+  }
+
+  // Compare and Validate
   const accountsEnd = await readAccounts(accounts_end_file);
   for (let i = 0; i < accounts.length; i++){
     assert(accounts[i].balance === accountsEnd[i].balance);
   }
 
-  console.log("done");
+  console.log("Finished Validation");
 }
 
 

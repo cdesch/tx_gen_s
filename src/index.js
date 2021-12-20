@@ -53,21 +53,16 @@ function generateTransactions(accounts, numTransactions, amountMax) {
         senderId = rand(accounts.length);
         receiverId = rand(accounts.length);
     } while((senderId === receiverId));
-
-    // console.log(senderId)
-    // console.log(receiverId)
     
     const tx = generateTransaction(accounts[senderId], accounts[receiverId], amountMax);
     accounts[senderId].balance -= tx.amount;
     accounts[receiverId].balance += tx.amount;
-    // accounts.push(initialBalance);
     transactions.push(tx);
   } 
 
-
   // Write to CSV
   const transactionsWriter = createCsvWriter({
-    path: `transactions_${numTransactions}.csv`,
+    path: `../data/transactions_${numTransactions}.csv`,
     header: [
       {id: 'sender', title: 'sender'},
       {id: 'receiver', title: 'receiver'},
@@ -75,11 +70,13 @@ function generateTransactions(accounts, numTransactions, amountMax) {
     ]
   });
 
+  // Write to CSV
   transactionsWriter
   .writeRecords(transactions)
   .then(()=> console.log('The CSV file was written successfully'));
 
 
+  return transactions;
 }
 
 function main() {
@@ -89,18 +86,18 @@ function main() {
   const initialBalance = 1000;
   const transctionMaxAmount = 10;
   const accounts = [];
-  const transactions = [];
+  const transactionBatches = [];
   const batches = [1000, 5000, 10000];
+
   // Generate number of accounts
   for(var i = 0; i < numAccounts; i++){
-
     // accounts.push(initialBalance);
     accounts.push(new Account(i, i.toString(), initialBalance));
   }
 
   // Write to CSV
   const accountsWriter = createCsvWriter({
-    path: 'accounts.csv',
+    path: '../data/accounts.csv',
     header: [
       {id: 'id', title: 'id'},
       {id: 'name', title: 'name'},
@@ -114,13 +111,30 @@ function main() {
 
   // Generate for each batch
   batches.forEach(element => {
-    generateTransactions(accounts, element, transctionMaxAmount)
+    const transactions = generateTransactions(accounts, element, transctionMaxAmount)
+    transactionBatches.push(transactions);
   });
+
+  // Repeat
+  transactionBatches.forEach((transactions) => {
+    transactions.forEach((tx) => {
+      accounts[tx.sender].balance -= tx.amount;
+      accounts[tx.receiver].balance += tx.amount;
+    })
+  })
+
+  // Repeat
+  transactionBatches.forEach((transactions) => {
+    transactions.forEach((tx) => {
+      accounts[tx.sender].balance -= tx.amount;
+      accounts[tx.receiver].balance += tx.amount;
+    })
+  }) 
  
   
   // Write to CSV
   const accountsEndWriter = createCsvWriter({
-    path: 'accounts_end.csv',
+    path: '../data/accounts_end.csv',
     header: [
       {id: 'id', title: 'id'},
       {id: 'name', title: 'name'},
