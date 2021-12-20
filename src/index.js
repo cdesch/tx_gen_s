@@ -21,19 +21,23 @@ function rand(maxLimit = 100) {
   return  Math.floor(Math.random() * maxLimit);
 }   
 
-
-const chooseRandom = (arr, num = 1) => {
-  const res = [];
-  for(let i = 0; i < num; ){
-     const random = Math.floor(Math.random() * arr.length);
-     if(res.indexOf(arr[random]) !== -1){
-        continue;
-     };
-     res.push(arr[random]);
-     i++;
-  };
-  return res;
-}; 
+function writeToCSV(filename, headers, data) {
+  return new Promise((resolve, reject) => {
+    // Setup CSV Writer
+    const csvWriter = createCsvWriter({
+      path: filename,
+      header: headers
+    });
+    
+    // Write to CSV
+    csvWriter
+    .writeRecords(data)
+    .then(() => {
+      console.log(`The CSV file ${filename} was written successfully`);
+      resolve(true);
+    });
+  });
+}
 
 function generateTransaction(senderAccount, receiverAccount, amountMax) {
   return new Transaction(senderAccount.name, receiverAccount.name, rand(amountMax));
@@ -42,44 +46,46 @@ function generateTransaction(senderAccount, receiverAccount, amountMax) {
 function generateTransactions(accounts, numTransactions, amountMax) {
   const transactions = [];
   // Generate Transactions
-  // const accountsForTransaction = chooseRandom(accounts, 2)
-  // console.log(accountsForTransaction);
   for(var i = 0; i < numTransactions; i++){
     var senderId = 3; 
     var receiverId = 3; 
-    // console.log(accounts.length)
     // run this loop until numberOne is different than numberThree
     do {
         senderId = rand(accounts.length);
         receiverId = rand(accounts.length);
     } while((senderId === receiverId));
     
+    // Generate Transaction
     const tx = generateTransaction(accounts[senderId], accounts[receiverId], amountMax);
+    
+    // Update the Account Balances
     accounts[senderId].balance -= tx.amount;
     accounts[receiverId].balance += tx.amount;
+
+    // Add Transaction to the array
     transactions.push(tx);
   } 
 
-  // Write to CSV
-  const transactionsWriter = createCsvWriter({
-    path: `../data/transactions_${numTransactions}.csv`,
-    header: [
-      {id: 'sender', title: 'sender'},
-      {id: 'receiver', title: 'receiver'},
-      {id: 'amount', title: 'amount'},
-    ]
-  });
 
-  // Write to CSV
-  transactionsWriter
-  .writeRecords(transactions)
-  .then(()=> console.log('The CSV file was written successfully'));
+  // // Write to CSV
+  // const transactionsWriter = createCsvWriter({
+  //   path: `./data/transactions_${numTransactions}.csv`,
+  //   header: [
+  //     {id: 'sender', title: 'sender'},
+  //     {id: 'receiver', title: 'receiver'},
+  //     {id: 'amount', title: 'amount'},
+  //   ]
+  // });
 
+  // // Write to CSV
+  // transactionsWriter
+  // .writeRecords(transactions)
+  // .then(()=> console.log('The CSV file was written successfully'));
 
   return transactions;
 }
 
-function main() {
+async function main() {
   
   const numAccounts = 1000;
   const numTransactions = 1000
@@ -89,6 +95,17 @@ function main() {
   const transactionBatches = [];
   const batches = [1000, 5000, 10000];
 
+  const accountHeaders = [
+    {id: 'id', title: 'id'},
+    {id: 'name', title: 'name'},
+    {id: 'balance', title: 'balance'},
+  ];
+  const transactionHeaders = [
+    {id: 'sender', title: 'sender'},
+    {id: 'receiver', title: 'receiver'},
+    {id: 'amount', title: 'amount'},
+  ];
+
   // Generate number of accounts
   for(var i = 0; i < numAccounts; i++){
     // accounts.push(initialBalance);
@@ -96,24 +113,36 @@ function main() {
   }
 
   // Write to CSV
-  const accountsWriter = createCsvWriter({
-    path: '../data/accounts.csv',
-    header: [
-      {id: 'id', title: 'id'},
-      {id: 'name', title: 'name'},
-      {id: 'balance', title: 'balance'},
-    ]
-  });
-  accountsWriter
-  .writeRecords(accounts)
-  .then(()=> console.log('The CSV file was written successfully'));
+  // const accountsWriter = createCsvWriter({
+  //   path: './data/accounts.csv',
+  //   header: [
+  //     {id: 'id', title: 'id'},
+  //     {id: 'name', title: 'name'},
+  //     {id: 'balance', title: 'balance'},
+  //   ]
+  // });
+  // accountsWriter
+  // .writeRecords(accounts)
+  // .then(()=> console.log('The CSV file was written successfully'));
+  await writeToCSV('./data/accounts.csv', accountHeaders, accounts);
 
-
+  console.log(batches);
   // Generate for each batch
-  batches.forEach(element => {
-    const transactions = generateTransactions(accounts, element, transctionMaxAmount)
+  for (const numTransactions of batches) {
+    const transactions = generateTransactions(accounts, numTransactions, transctionMaxAmount)
+
+    // Write to file
+    await writeToCSV(`./data/transactions_${numTransactions}.csv`, transactionHeaders, transactions);
     transactionBatches.push(transactions);
-  });
+  }
+
+  // batches.forEach(element => {
+  //   const transactions = generateTransactions(accounts, element, transctionMaxAmount)
+  
+  //   const result = await writeToCSV(`./data/transactions_${numTransactions}.csv`,transactionHeaders, transactions);
+  //   console.log(result);
+  //   transactionBatches.push(transactions);
+  // });
 
   // Repeat
   transactionBatches.forEach((transactions) => {
@@ -131,21 +160,29 @@ function main() {
     })
   }) 
  
-  
   // Write to CSV
-  const accountsEndWriter = createCsvWriter({
-    path: '../data/accounts_end.csv',
-    header: [
-      {id: 'id', title: 'id'},
-      {id: 'name', title: 'name'},
-      {id: 'balance', title: 'balance'},
-    ]
-  });
-  accountsEndWriter
-  .writeRecords(accounts)
-  .then(()=> console.log('The CSV file was written successfully'));
+  // const accountsEndWriter = createCsvWriter({
+  //   path: './data/accounts_end.csv',
+  //   header: [
+  //     {id: 'id', title: 'id'},
+  //     {id: 'name', title: 'name'},
+  //     {id: 'balance', title: 'balance'},
+  //   ]
+  // });
+
+  // accountsEndWriter
+  // .writeRecords(accounts)
+  // .then(()=> console.log('The CSV file was written successfully'));
+  await writeToCSV('./data/accounts_end.csv', accountHeaders, accounts);
 
 }
 
-
-main();
+// main();
+(async () => {
+  try {
+      var text = await main();
+      console.log("Finished Generating Transactions");
+  } catch (e) {
+      // Deal with the fact the chain failed
+  }
+})();

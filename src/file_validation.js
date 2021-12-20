@@ -15,18 +15,8 @@ class Transaction {
     this.sender = sender;
     this.receiver = receiver;
     this.amount = amount;
-  }
- 
+  } 
 }
-
-// fs.createReadStream('data.csv')
-//   .pipe(csv())
-//   .on('data', (row) => {
-//     console.log(row);
-//   })
-//   .on('end', () => {
-//     console.log('CSV file successfully processed');
-//   });
 
 function readAccounts(filename) {
   return new Promise((resolve, reject) => {
@@ -38,7 +28,7 @@ function readAccounts(filename) {
       accounts.push(account);
     })
     .on('end', () => {
-      console.log('CSV file successfully processed');
+      console.log(`CSV file ${filename} successfully processed`);
       resolve(accounts);
     });
   });
@@ -54,18 +44,17 @@ function readTransactions(filename) {
       items.push(tx);
     })
     .on('end', () => {
-      console.log('CSV file successfully processed');
+      console.log(`CSV file ${filename} successfully processed`);
       resolve(items);
     });
   });
 }
 
 async function main() {
-  const accounts_file = '../data/accounts.csv';
-  const accounts_end_file = '../data/accounts_end.csv';
+  const accounts_file = './data/accounts.csv';
+  const accounts_end_file = './data/accounts_end.csv';
   const batches = [1000, 5000, 10000];
-  const transaction_files = batches.map((amount) => `../data/transactions_${amount}.csv`);
-  // console.log(transaction_files);
+  const transaction_files = batches.map((amount) => `./data/transactions_${amount}.csv`);
 
   const accounts = await readAccounts(accounts_file);
 
@@ -97,12 +86,12 @@ async function main() {
 
   // Compare and Validate
   const accountsEnd = await readAccounts(accounts_end_file);
-  for (let i = 0; i < accounts.length; i++){
+  for (let i = 0; i < accounts.length; i++) {
     assert(accounts[i].balance === accountsEnd[i].balance);
   }
 
   console.log("Finished Validation");
 }
 
-
+// Start
 main();
