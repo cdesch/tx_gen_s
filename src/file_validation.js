@@ -56,8 +56,10 @@ async function main() {
   const batches = [1000, 5000, 10000];
   const transaction_files = batches.map((amount) => `./data/transactions_${amount}.csv`);
 
+  // Read in initial Account Data
   const accounts = await readAccounts(accounts_file);
 
+  // Read in Each Transaction file and run them
   for (const file of transaction_files) {
     const transactions = await readTransactions(file);
     transactions.forEach((tx) => {
@@ -66,7 +68,7 @@ async function main() {
     });
   }
 
-  // Repeat
+  // Repeat for additional run
   for (const file of transaction_files) {
     const transactions = await readTransactions(file);
     transactions.forEach((tx) => {

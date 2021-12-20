@@ -113,21 +113,9 @@ async function main() {
   }
 
   // Write to CSV
-  // const accountsWriter = createCsvWriter({
-  //   path: './data/accounts.csv',
-  //   header: [
-  //     {id: 'id', title: 'id'},
-  //     {id: 'name', title: 'name'},
-  //     {id: 'balance', title: 'balance'},
-  //   ]
-  // });
-  // accountsWriter
-  // .writeRecords(accounts)
-  // .then(()=> console.log('The CSV file was written successfully'));
   await writeToCSV('./data/accounts.csv', accountHeaders, accounts);
 
-  console.log(batches);
-  // Generate for each batch
+  // Generate transactions for each batch
   for (const numTransactions of batches) {
     const transactions = generateTransactions(accounts, numTransactions, transctionMaxAmount)
 
@@ -136,15 +124,7 @@ async function main() {
     transactionBatches.push(transactions);
   }
 
-  // batches.forEach(element => {
-  //   const transactions = generateTransactions(accounts, element, transctionMaxAmount)
-  
-  //   const result = await writeToCSV(`./data/transactions_${numTransactions}.csv`,transactionHeaders, transactions);
-  //   console.log(result);
-  //   transactionBatches.push(transactions);
-  // });
-
-  // Repeat
+  // Repeat for additional Run 
   transactionBatches.forEach((transactions) => {
     transactions.forEach((tx) => {
       accounts[tx.sender].balance -= tx.amount;
@@ -152,7 +132,7 @@ async function main() {
     })
   })
 
-  // Repeat
+  // Repeat for additional Run 
   transactionBatches.forEach((transactions) => {
     transactions.forEach((tx) => {
       accounts[tx.sender].balance -= tx.amount;
@@ -160,19 +140,7 @@ async function main() {
     })
   }) 
  
-  // Write to CSV
-  // const accountsEndWriter = createCsvWriter({
-  //   path: './data/accounts_end.csv',
-  //   header: [
-  //     {id: 'id', title: 'id'},
-  //     {id: 'name', title: 'name'},
-  //     {id: 'balance', title: 'balance'},
-  //   ]
-  // });
-
-  // accountsEndWriter
-  // .writeRecords(accounts)
-  // .then(()=> console.log('The CSV file was written successfully'));
+  // Write Ending Account Balances to CSV
   await writeToCSV('./data/accounts_end.csv', accountHeaders, accounts);
 
 }
