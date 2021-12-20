@@ -4,13 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "validate": "node src/file_validation.js"
+    "start": "babel-node src/index.js",
+    "validate": "babel-node src/file_validation.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "csv-parser": "^3.0.0",
     "csv-writer": "^1.6.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.16.0",
+    "@babel/core": "^7.16.5",
+    "@babel/node": "^7.16.5",
+    "@babel/preset-env": "^7.16.5"
   }
 }

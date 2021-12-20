@@ -1,21 +1,6 @@
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
-
-class Account {
-  constructor(id, name, balance) {
-    this.id = id;
-    this.name = name;
-    this.balance = balance;
-  }
-}
-
-class Transaction {
-  constructor(sender, receiver, amount) {
-    this.sender = sender;
-    this.receiver = receiver;
-    this.amount = amount;
-  }
- 
-}
+import Account from './models/account';
+import Transaction from './models/Transaction';
 
 function rand(maxLimit = 100) {
   return  Math.floor(Math.random() * maxLimit);
@@ -65,22 +50,6 @@ function generateTransactions(accounts, numTransactions, amountMax) {
     // Add Transaction to the array
     transactions.push(tx);
   } 
-
-
-  // // Write to CSV
-  // const transactionsWriter = createCsvWriter({
-  //   path: `./data/transactions_${numTransactions}.csv`,
-  //   header: [
-  //     {id: 'sender', title: 'sender'},
-  //     {id: 'receiver', title: 'receiver'},
-  //     {id: 'amount', title: 'amount'},
-  //   ]
-  // });
-
-  // // Write to CSV
-  // transactionsWriter
-  // .writeRecords(transactions)
-  // .then(()=> console.log('The CSV file was written successfully'));
 
   return transactions;
 }

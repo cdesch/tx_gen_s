@@ -2,21 +2,9 @@ const { assert } = require('console');
 const csv = require('csv-parser');
 const fs = require('fs');
 
-class Account {
-  constructor(id, name, balance) {
-    this.id = id;
-    this.name = name;
-    this.balance = balance;
-  }
-}
+import Account from './models/account';
+import Transaction from './models/Transaction';
 
-class Transaction {
-  constructor(sender, receiver, amount) {
-    this.sender = sender;
-    this.receiver = receiver;
-    this.amount = amount;
-  } 
-}
 
 function readAccounts(filename) {
   return new Promise((resolve, reject) => {

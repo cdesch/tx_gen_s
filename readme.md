@@ -29,3 +29,8 @@ Batches
     1000
     5000
     10000
+
+## TODO
+
+- [x] Convert to ES6 Syntax with Babel
+- [x] Separate Models into their own directory
